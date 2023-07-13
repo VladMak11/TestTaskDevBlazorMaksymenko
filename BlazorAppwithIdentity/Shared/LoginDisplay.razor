@@ -1,11 +1,41 @@
 ﻿<AuthorizeView>
     <Authorized>
-        Hi dear, @context.User.Identity.Name
-        <a href="Identity/Account/Logout">Logout</a>
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="text-light pt-3">
+                Hi dear, @context.User.Identity.Name
+            </li>
+            <li class="nav-item p-0">
+                <NavLink class="nav-link" href="Identity/Account/Logout">
+                    <span class="btn btn-light">
+                        Logout
+                    </span>
+                </NavLink>
+            </li>
+        </ul>
+        @*<a href="Identity/Account/Logout">Logout</a>*@
     </Authorized>
     <NotAuthorized>
-        <a href="Identity/Account/Register">Register</a>
-        <a href="Identity/Account/Login">Login</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item p-2">
+                    <NavLink class="nav-link" href="Identity/Account/Register">
+                        <span class="btn btn-light">
+                            Register
+                        </span>
+                    </NavLink>
+                </li>
+                <li class="nav-item p-2">
+                    <NavLink class="nav-link" href="Identity/Account/Login">
+                        <span class="btn btn-light">
+                            Login
+                        </span>
+                    </NavLink>
+                 </li>
+            </ul>
+        </div>
+
+        @*<a href="Identity/Account/Register">Register</a>*@
+        @*<a href="Identity/Account/Login">Login</a>*@
     </NotAuthorized>
 </AuthorizeView>
 
