@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BlazorAppwithIdentity.Migrations
 {
-    [DbContext(typeof(BlazorAppwithIdentityContext))]
+    [DbContext(typeof(ApplicationDbContext))]
     [Migration("20230712162309_InitialMigration")]
     partial class InitialMigration
     {
