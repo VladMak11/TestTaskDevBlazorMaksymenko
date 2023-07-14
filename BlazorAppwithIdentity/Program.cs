@@ -13,8 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options => 
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")
-    ), ServiceLifetime.Transient
-) ;
+    )
+);
 //builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts => { opts.Password.RequireNonAlphanumeric = false; })
 //                .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.Password.RequireNonAlphanumeric = false).AddEntityFrameworkStores<ApplicationDbContext>();

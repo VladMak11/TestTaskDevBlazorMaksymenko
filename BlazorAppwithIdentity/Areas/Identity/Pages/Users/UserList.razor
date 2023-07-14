@@ -5,6 +5,9 @@
 
 @inject UserManager<ApplicationUser> _userManager
 @inject AuthenticationStateProvider _authenticationStateProvider
+@inject IJSRuntime _jsRuntime
+
+<_DeleteConfirmation ConfirmationChanged="ConfirmDeleteClickAsync"></_DeleteConfirmation>
 
 <div class="row mt-4">
     <div class="col-6">
@@ -52,6 +55,7 @@
                             </td>
                             <td>
                                 <NavLink href="@($"user/edit/{item.Id}")" class="btn-primary btn">Edit</NavLink>
+                                <button class="btn btn-danger" @onclick="async () => await HandleDelete(item.Id)">Delete</button>
                             </td>
                         </tr>
                     }
@@ -61,8 +65,10 @@
     </div>
 </div>
 
+
 @code {
     private IEnumerable<UserVM> users { get; set; } = new List<UserVM>();
+    private string? DeleteUserId { get; set; } = null;
     protected override async Task OnInitializedAsync()
     {
         var authenticationState = await _authenticationStateProvider.GetAuthenticationStateAsync();
@@ -79,4 +85,22 @@
                 CurrentPropertyValueSum = p.CurrentPropertyValueSum.GetValueOrDefault()
             }).Where(p => p.Id != user.FindFirst(ClaimTypes.NameIdentifier)?.Value);
     }
+
+    private async Task HandleDelete(string id)
+    {
+        DeleteUserId = id; 
+        await _jsRuntime.InvokeVoidAsync("ShowDeleteConfirmationModal");
+    }
+
+    private async Task ConfirmDeleteClickAsync(bool isConfirmed)
+    {
+        if (isConfirmed && DeleteUserId != null)
+        {
+            var existingUser = await _userManager.FindByIdAsync(DeleteUserId);
+            await _userManager.DeleteAsync(existingUser);
+            users = users.Where(x => x.Id != DeleteUserId);
+            await _jsRuntime.InvokeVoidAsync("HideDeleteConfirmationModal");
+        }
+    }
 }
+

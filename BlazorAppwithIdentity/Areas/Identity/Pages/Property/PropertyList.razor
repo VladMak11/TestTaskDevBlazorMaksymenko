@@ -22,6 +22,7 @@
                         <th>Purchase DateTime</th>
                         <th>Initial Value</th>
                         <th>Depreciation Period</th>
+                        <th>Depreciation Value</th>
                         <th>Current Value</th>
                     </tr>
                 </thead>
@@ -39,7 +40,7 @@
                                 @item.Type
                             </td>
                             <td>
-                                @item.PurchaseDateTime
+                                @item.PurchaseDateTime.ToString("f")
                             </td>
                             <td>
                                 @item.InitialValue
@@ -67,7 +68,7 @@
     protected override async Task OnInitializedAsync()
     {
         var propertyModels = await _unitOfWork.Properties.GetAllAsync(includeProp: "ApplicationUser");
-            properties = propertyModels.Select(p => new PropertyVM
+        properties = propertyModels.Select(p => new PropertyVM
                 {
                     Id = p.Id,
                     Name = p.Name,
@@ -80,5 +81,6 @@
                     DepreciationValue = p.DepreciationValue,
                     CurrentValue = _propertyHelper.CalculationCurrentValue(p)
                 });
+
     }
 }

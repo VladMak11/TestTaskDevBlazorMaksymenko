@@ -129,9 +129,7 @@
                 existingUser.PhoneNumber = objUser.PhoneNumber;
                 existingUser.InitialPropertyValueSum = objUser.InitialPropertyValueSum;
                 existingUser.CurrentPropertyValueSum = objUser.CurrentPropertyValueSum;
-                Console.WriteLine("WORK. 132");
                 await _userManager.UpdateAsync(existingUser);
-                
             }
         }
 
