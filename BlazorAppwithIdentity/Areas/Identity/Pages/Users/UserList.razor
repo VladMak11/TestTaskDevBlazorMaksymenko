@@ -1,0 +1,82 @@
+﻿@page "/user"
+@using Microsoft.AspNetCore.Identity;
+@using Microsoft.EntityFrameworkCore;
+@using System.Security.Claims;
+
+@inject UserManager<ApplicationUser> _userManager
+@inject AuthenticationStateProvider _authenticationStateProvider
+
+<div class="row mt-4">
+    <div class="col-6">
+        <h4 class="card-title text-black">Users List</h4>
+    </div>
+    <div class="col-4 offset-2">
+        <a href="user/create" class="btn btn-primary form-control">Add New User</a>
+    </div>
+    <div class="col-12">
+        @if (users.Any())
+        {
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Adress</th>
+                        <th>Phone Number</th>
+                        <th>Initial Property Value Sum</th>
+                        <th>Current Property Value Sum</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in users)
+                    {
+                        <tr>
+                            <td>
+                                @item.Name
+                            </td>
+                            <td>
+                                @item.Email
+                            </td>
+                            <td>
+                                @item.Address
+                            </td>
+                            <td>
+                                @item.PhoneNumber
+                            </td>
+                            <td>
+                                @item.InitialPropertyValueSum
+                            </td>
+                            <td>
+                                @item.CurrentPropertyValueSum
+                            </td>
+                            <td>
+                                <NavLink href="" class="btn-primary btn">Edit</NavLink>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@code {
+    private IEnumerable<UserVM> users { get; set; } = new List<UserVM>();
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authenticationState.User;
+        var usersAll = await _userManager.Users.ToListAsync();
+        users = usersAll.Select(p => new UserVM
+        {
+                Id = p.Id,
+                Name = p.Name,
+                Email = p.Email,
+                Address = p.Address,
+                PhoneNumber = p.PhoneNumber,
+                InitialPropertyValueSum = p.InitialPropertyValueSum.GetValueOrDefault(),
+                CurrentPropertyValueSum = p.CurrentPropertyValueSum.GetValueOrDefault()
+            }).Where(p => p.Id != user.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+    }
+}

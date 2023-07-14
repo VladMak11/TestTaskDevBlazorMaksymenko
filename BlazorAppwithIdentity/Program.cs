@@ -1,3 +1,6 @@
+using BlazorAppDataAccess.Interfaces;
+using BlazorAppDataAccess.UnitOfWork;
+using BlazorAppModels.ModelHelper;
 using BlazorAppModels.Models;
 using BlazorAppwithIdentity.Data;
 using Microsoft.AspNetCore.Components;
@@ -17,8 +20,8 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.Password
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-
-
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<PropertyHelper>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -26,6 +29,10 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
     app.UseHsts();
+}
+else
+{
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();

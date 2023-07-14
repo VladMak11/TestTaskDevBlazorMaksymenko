@@ -21,13 +21,13 @@ namespace BlazorAppModels.ModelHelper
         {
             switch (period.ToLower())
             {
-                case "день":
+                case "day":
                     return 1;
-                case "тиждень":
+                case "week":
                     return 7;
-                case "місяць":
+                case "mounth":
                     return 30;
-                case "рік":
+                case "year":
                     return 365;
                 default:
                     throw new ArgumentException("Невідомий період.");

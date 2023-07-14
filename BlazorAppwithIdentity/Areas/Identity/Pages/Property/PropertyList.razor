@@ -1,0 +1,84 @@
+﻿@page "/property"
+
+@inject IUnitOfWork _unitOfWork
+@inject PropertyHelper _propertyHelper
+
+<div class="row mt-4">
+    <div class="col-6">
+        <h4 class="card-title text-black">Property List</h4>
+    </div>
+    <div class="col-4 offset-2">
+        <a href="property/create" class="btn btn-primary form-control">Add New Property</a>
+    </div>
+    <div class="col-12">
+        @if (properties.Any())
+        {
+            <table class="table table-bordered table-active">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Owner</th>
+                        <th>Type</th>
+                        <th>Purchase DateTime</th>
+                        <th>Initial Value</th>
+                        <th>Depreciation Period</th>
+                        <th>Current Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in properties)
+                    {
+                        <tr>
+                            <td>
+                                @item.Name
+                            </td>
+                            <td>
+                                @item.ApplicationUser.Name
+                            </td>
+                            <td>
+                                @item.Type
+                            </td>
+                            <td>
+                                @item.PurchaseDateTime
+                            </td>
+                            <td>
+                                @item.InitialValue
+                            </td>
+                            <td>
+                                @item.DepreciationPeriod
+                            </td>
+                            <td>
+                                @item.DepreciationValue
+                            </td>
+                            <td>
+                                @item.CurrentValue
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@code {
+    private IEnumerable<PropertyVM> properties { get; set; } = new List<PropertyVM>();
+    //private string nameuser;
+    protected override async Task OnInitializedAsync()
+    {
+        var propertyModels = await _unitOfWork.Properties.GetAllAsync(includeProp: "ApplicationUser");
+            properties = propertyModels.Select(p => new PropertyVM
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    ApplicationUserId = p.ApplicationUserId,
+                    ApplicationUser = p.ApplicationUser,
+                    Type = p.Type,
+                    PurchaseDateTime = p.PurchaseDateTime,
+                    InitialValue = p.InitialValue,
+                    DepreciationPeriod = p.DepreciationPeriod,
+                    DepreciationValue = p.DepreciationValue,
+                    CurrentValue = _propertyHelper.CalculationCurrentValue(p)
+                });
+    }
+}
