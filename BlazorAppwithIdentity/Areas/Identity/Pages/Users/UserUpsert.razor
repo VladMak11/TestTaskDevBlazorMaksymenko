@@ -1,4 +1,5 @@
 ﻿@page "/user/create"
+@page "/user/edit/{id}"
 
 @using Microsoft.AspNetCore.Identity;
 @using Microsoft.EntityFrameworkCore;
@@ -9,73 +10,134 @@
 @inject UserManager<ApplicationUser> _userManager
 
 <div class="row my-2 card col-10">
-    <h3 class="card-title text-primary mb-3 ">Create User</h3>
+    <h3 class="card-title text-primary mb-3 ">@Title User</h3>
     <div class="col-12">
-        <EditForm Model="objUser" OnValidSubmit="UpsertUser">
-            <DataAnnotationsValidator />
-            <div class="form-group">
-                <label>Name</label>
-                <InputText @bind-Value="objUser.Name" class="form-control"></InputText>
-                <ValidationMessage For="()=>objUser.Name"></ValidationMessage>
-            </div>
-            <br />
-            <div class="form-group">
-                <label>E-mail</label>
-                <InputText @bind-Value="objUser.Email" class="form-control"></InputText>
-                <ValidationMessage For="()=>objUser.Email"></ValidationMessage>
-            </div>
-            <br />
-            <div class="form-group">
-                <label>Address</label>
-                <InputText @bind-Value="objUser.Address" class="form-control"></InputText>
-                <ValidationMessage For="()=>objUser.Address"></ValidationMessage>
-            </div>
-            <br />
-            <div class="form-group">
-                <label>Phone Number</label>
-                <InputText @bind-Value="objUser.PhoneNumber" class="form-control"></InputText>
-                <ValidationMessage For="()=>objUser.PhoneNumber"></ValidationMessage>
-            </div>
-            <br />
-            <div class="form-group mb-2">
-                <label>Initial Property Value Sum</label>
-                <InputNumber TValue="Decimal" @bind-Value="objUser.InitialPropertyValueSum" class="form-control"></InputNumber>
-                <ValidationMessage For="()=>objUser.InitialPropertyValueSum"></ValidationMessage>
-            </div>
-            <div class="form-group mb-2">
-                <label>Current Property Value Sum</label>
-                <InputNumber TValue="Decimal" @bind-Value="objUser.CurrentPropertyValueSum" class="form-control"></InputNumber>
-                <ValidationMessage For="()=>objUser.CurrentPropertyValueSum"></ValidationMessage>
-            </div>
-            <div class="form-group mb-2">
-                <button class="btn btn-primary" @onclick="async () => await UpsertUser()">@Title</button>
-                <NavLink href="user" class="btn btn-secondary">Back to List</NavLink>
-            </div>
-        </EditForm>
+        @if (IsLoading)
+        {
+            <p>Loading...</p>
+        }
+        else
+        {
+            <EditForm Model="objUser" OnSubmit="UpsertUserAsync">
+                <DataAnnotationsValidator />
+                <div class="form-group">
+                    <label>Name</label>
+                    <InputText @bind-Value="objUser.Name" class="form-control"></InputText>
+                    <ValidationMessage For="()=>objUser.Name"></ValidationMessage>
+                </div>
+                <br />
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <InputText @bind-Value="objUser.Email" class="form-control"></InputText>
+                    <ValidationMessage For="()=>objUser.Email"></ValidationMessage>
+                </div>
+                <br />
+                <div class="form-group">
+                    <label>Address</label>
+                    <InputText @bind-Value="objUser.Address" class="form-control"></InputText>
+                    <ValidationMessage For="()=>objUser.Address"></ValidationMessage>
+                </div>
+                <br />
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <InputText @bind-Value="objUser.PhoneNumber" class="form-control"></InputText>
+                    <ValidationMessage For="()=>objUser.PhoneNumber"></ValidationMessage>
+                </div>
+                <br />
+                <div class="form-group mb-2">
+                    <label>Initial Property Value Sum</label>
+                    <InputNumber TValue="Decimal" @bind-Value="objUser.InitialPropertyValueSum" class="form-control"></InputNumber>
+                    <ValidationMessage For="()=>objUser.InitialPropertyValueSum"></ValidationMessage>
+                </div>
+                <div class="form-group mb-2">
+                    <label>Current Property Value Sum</label>
+                    <InputNumber TValue="Decimal" @bind-Value="objUser.CurrentPropertyValueSum" class="form-control"></InputNumber>
+                    <ValidationMessage For="()=>objUser.CurrentPropertyValueSum"></ValidationMessage>
+                </div>
+                <div class="form-group mb-2">
+                    <button type="submit" class="btn btn-primary">@Title</button>
+                    <NavLink href="user" class="btn btn-secondary">Back to List</NavLink>
+                </div>
+            </EditForm>
+        }
     </div>
 </div>
 
 
 @code {
+
+    [Parameter]
+    public string Id { get; set; }
+
     private string Title { get; set; } = "Create";
     private UserVM objUser { get; set; } = new UserVM() { };
-
-    private async Task UpsertUser()
+    public bool IsLoading { get; set; } = true;
+    
+    protected override async Task OnInitializedAsync()
     {
-        await _userManager.CreateAsync(new ApplicationUser
-            {
-                UserName = objUser.Email,
-                Email = objUser.Email,
-                Name = objUser.Name,
-                Address = objUser.Address,
-                PhoneNumber = objUser.PhoneNumber,
-                InitialPropertyValueSum = objUser.InitialPropertyValueSum,
-                CurrentPropertyValueSum = objUser.CurrentPropertyValueSum,
-            }, GenerateRandomPassword(13));
+        if (string.IsNullOrEmpty(Id))
+        {
+            IsLoading = false;
+        }
+        else
+        {
+            Title = "Update";
+            await LoadUserAsync();
+        }
 
-
-        _navigationManager.NavigateTo("user");
     }
+
+    private async Task LoadUserAsync()
+    {
+
+        var searchUserinDB = await _userManager.FindByIdAsync(Id);
+
+        objUser.Id = searchUserinDB.Id;
+        objUser.Name = searchUserinDB.Name;
+        objUser.Email = searchUserinDB.Email;
+        objUser.Address = searchUserinDB.Address;
+        objUser.PhoneNumber = searchUserinDB.PhoneNumber;
+        objUser.InitialPropertyValueSum = searchUserinDB.InitialPropertyValueSum.GetValueOrDefault();
+        objUser.CurrentPropertyValueSum = searchUserinDB.CurrentPropertyValueSum.GetValueOrDefault();
+
+        IsLoading = false;
+    }
+
+    private async Task UpsertUserAsync()
+    {
+        if (string.IsNullOrEmpty(objUser.Id))
+        {
+            await _userManager.CreateAsync(new ApplicationUser
+                {
+                    UserName = objUser.Email,
+                    Email = objUser.Email,
+                    Name = objUser.Name,
+                    Address = objUser.Address,
+                    PhoneNumber = objUser.PhoneNumber,
+                    InitialPropertyValueSum = objUser.InitialPropertyValueSum,
+                    CurrentPropertyValueSum = objUser.CurrentPropertyValueSum,
+                }, GenerateRandomPassword(13));
+        }
+        else
+        {
+            var existingUser = await _userManager.FindByIdAsync(objUser.Id);
+            if (existingUser != null)
+            {
+                existingUser.Name = objUser.Name;
+                existingUser.Email = objUser.Email;
+                existingUser.Address = objUser.Address;
+                existingUser.PhoneNumber = objUser.PhoneNumber;
+                existingUser.InitialPropertyValueSum = objUser.InitialPropertyValueSum;
+                existingUser.CurrentPropertyValueSum = objUser.CurrentPropertyValueSum;
+                Console.WriteLine("WORK. 132");
+                await _userManager.UpdateAsync(existingUser);
+                
+            }
+        }
+
+        _navigationManager.NavigateTo("user"); 
+    }
+
 
     private string GenerateRandomPassword(int length)
     {

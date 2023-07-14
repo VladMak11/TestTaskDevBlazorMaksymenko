@@ -71,8 +71,8 @@
         var user = authenticationState.User;
         property.ApplicationUserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         
-        _unitOfWork.Properties.AddAsync(property);
-        _unitOfWork.SaveAsync();
+        await _unitOfWork.Properties.AddAsync(property);
+        await _unitOfWork.SaveAsync();
 
         _navigationManager.NavigateTo("property");
     }
