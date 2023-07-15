@@ -2,10 +2,13 @@
 @using Microsoft.AspNetCore.Identity;
 @using Microsoft.EntityFrameworkCore;
 @using System.Security.Claims;
+@using AutoMapper;
+
 
 @inject UserManager<ApplicationUser> _userManager
 @inject AuthenticationStateProvider _authenticationStateProvider
 @inject IJSRuntime _jsRuntime
+@inject IMapper _iMapper
 
 <_DeleteConfirmation ConfirmationChanged="ConfirmDeleteClickAsync"></_DeleteConfirmation>
 
@@ -74,19 +77,8 @@
 
     private async Task LoadUsersAsync()
     {
-        //var authenticationState = await _authenticationStateProvider.GetAuthenticationStateAsync();
-        //var user = authenticationState.User;
         var usersAll = await _userManager.Users.ToListAsync();
-        users = usersAll.Select(p => new UserVM
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Email = p.Email,
-                Address = p.Address,
-                PhoneNumber = p.PhoneNumber,
-                InitialPropertyValueSum = p.InitialPropertyValueSum.GetValueOrDefault(),
-                CurrentPropertyValueSum = p.CurrentPropertyValueSum.GetValueOrDefault()
-            });
+        users = usersAll.Select(p => _iMapper.Map<UserVM>(p));
     }
     private async Task HandleDelete(string id)
     {

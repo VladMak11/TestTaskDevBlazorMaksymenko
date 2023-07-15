@@ -4,10 +4,13 @@
 @using Microsoft.AspNetCore.Identity;
 @using Microsoft.EntityFrameworkCore;
 @using System.Text;
+@using AutoMapper;
+
 
 @inject NavigationManager _navigationManager
 @inject AuthenticationStateProvider _authenticationStateProvider
 @inject UserManager<ApplicationUser> _userManager
+@inject IMapper _iMapper
 
 <div class="card shadow border-0 my-4 col-12 col-md-8 col-lg-6 mx-auto">
     <div class="card-header bg-dark text-white text-center py-3">
@@ -95,15 +98,7 @@
     {
 
         var searchUserinDB = await _userManager.FindByIdAsync(Id);
-
-        objUser.Id = searchUserinDB.Id;
-        objUser.Name = searchUserinDB.Name;
-        objUser.Email = searchUserinDB.Email;
-        objUser.Address = searchUserinDB.Address;
-        objUser.PhoneNumber = searchUserinDB.PhoneNumber;
-        objUser.InitialPropertyValueSum = searchUserinDB.InitialPropertyValueSum.GetValueOrDefault();
-        objUser.CurrentPropertyValueSum = searchUserinDB.CurrentPropertyValueSum.GetValueOrDefault();
-
+        objUser = _iMapper.Map<UserVM>(searchUserinDB);
         IsLoading = false;
     }
 
@@ -111,29 +106,18 @@
     {
         if (string.IsNullOrEmpty(objUser.Id))
         {
-            await _userManager.CreateAsync(new ApplicationUser
-                {
-                    UserName = objUser.Email,
-                    Email = objUser.Email,
-                    Name = objUser.Name,
-                    Address = objUser.Address,
-                    PhoneNumber = objUser.PhoneNumber,
-                    InitialPropertyValueSum = objUser.InitialPropertyValueSum,
-                    CurrentPropertyValueSum = objUser.CurrentPropertyValueSum,
-                }, GenerateRandomPassword(13));
+            var appUser = new ApplicationUser();
+            appUser = _iMapper.Map<UserVM, ApplicationUser>(objUser, appUser);
+            appUser.Id = Guid.NewGuid().ToString();
+            await _userManager.CreateAsync(appUser, GenerateRandomPassword(13));
         }
         else
         {
-            var existingUser = await _userManager.FindByIdAsync(objUser.Id);
-            if (existingUser != null)
+            var UserToUpdate = await _userManager.FindByIdAsync(objUser.Id);
+            if (UserToUpdate != null)
             {
-                existingUser.Name = objUser.Name;
-                existingUser.Email = objUser.Email;
-                existingUser.Address = objUser.Address;
-                existingUser.PhoneNumber = objUser.PhoneNumber;
-                existingUser.InitialPropertyValueSum = objUser.InitialPropertyValueSum;
-                existingUser.CurrentPropertyValueSum = objUser.CurrentPropertyValueSum;
-                await _userManager.UpdateAsync(existingUser);
+                UserToUpdate = _iMapper.Map<UserVM,ApplicationUser>(objUser, UserToUpdate);
+                await _userManager.UpdateAsync(UserToUpdate);
             }
         }
 

@@ -3,6 +3,7 @@ using BlazorAppDataAccess.UnitOfWork;
 using BlazorAppModels.ModelHelper;
 using BlazorAppModels.Models;
 using BlazorAppwithIdentity.Data;
+using BlazorAppwithIdentity.MappingProfiles;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
@@ -24,6 +25,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<PropertyHelper>();
+builder.Services.AddAutoMapper(typeof(DataAccessToWebProfile));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
