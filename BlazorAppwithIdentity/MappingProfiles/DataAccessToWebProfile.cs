@@ -18,7 +18,10 @@ namespace BlazorAppwithIdentity.MappingProfiles
                 .ForMember(dest => dest.InitialPropertyValueSum, opt => opt.MapFrom(src => src.InitialPropertyValueSum))
                 .ForMember(dest => dest.CurrentPropertyValueSum, opt => opt.MapFrom(src => src.CurrentPropertyValueSum))
                 .ReverseMap()
-                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));  
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
+
+            CreateMap<Property, PropertyVM>()
+           .ReverseMap();
         }
     }
 }

@@ -1,21 +1,33 @@
 ﻿@page "/property"
 
+@using AutoMapper;
+
 @inject IUnitOfWork _unitOfWork
 @inject PropertyHelper _propertyHelper
+@inject IMapper _iMapper
+@inject IJSRuntime _jsRuntime
+@attribute [Authorize]
 
-<div class="row mt-4">
-    <div class="col-6">
-        <h4 class="card-title text-black">Property List</h4>
+<_DeleteConfirmation ConfirmationChanged="ConfirmDeleteClickAsync"></_DeleteConfirmation>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-6 d-flex justify-content-end">
+            <h4 class="card-title text-black">Properties List</h4>
+        </div>
+        <div class="col-6 d-flex justify-content-end mb-2">
+            <a href="property/create" class="btn btn-dark">
+                <i class="bi bi-patch-plus"></i>
+                <span class="ms-2">Add New Property</span>
+            </a>
+        </div>
     </div>
-    <div class="col-4 offset-2">
-        <a href="property/create" class="btn btn-primary form-control">Add New Property</a>
-    </div>
-    <div class="col-12">
-        @if (properties.Any())
-        {
-            <table class="table table-bordered table-active">
-                <thead>
-                    <tr>
+    @if (properties.Any())
+    {
+        <div class="table-responsive bg-white">
+            <table class="table table-bordered mt-4 table-hover">
+                <thead class="bg-dark">
+                    <tr class="text-light">
                         <th>Name</th>
                         <th>Owner</th>
                         <th>Type</th>
@@ -24,63 +36,73 @@
                         <th>Depreciation Period</th>
                         <th>Depreciation Value</th>
                         <th>Current Value</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in properties)
                     {
                         <tr>
+                            <td>@item.Name</td>
+                            <td>@item.ApplicationUser.Name</td>
+                            <td>@item.Type</td>
+                            <td>@item.PurchaseDateTime.ToString("f")</td>
+                            <td>@item.InitialValue</td>
+                            <td>@item.DepreciationPeriod</td>
+                            <td>@item.DepreciationValue</td>
+                            <td>@item.CurrentValue</td>
                             <td>
-                                @item.Name
-                            </td>
-                            <td>
-                                @item.ApplicationUser.Name
-                            </td>
-                            <td>
-                                @item.Type
-                            </td>
-                            <td>
-                                @item.PurchaseDateTime.ToString("f")
-                            </td>
-                            <td>
-                                @item.InitialValue
-                            </td>
-                            <td>
-                                @item.DepreciationPeriod
-                            </td>
-                            <td>
-                                @item.DepreciationValue
-                            </td>
-                            <td>
-                                @item.CurrentValue
+                                <NavLink href="@($"property/edit/{item.Id}")" class="btn btn-primary"><i class="bi bi-pencil-square"></i></NavLink>
+                                <button class="btn btn-danger" @onclick="async () => await HandleDelete(item.Id)"><i class="bi bi-trash-fill"></i></button>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
-        }
-    </div>
+        </div>
+    }
+    else
+    {
+        <p>No users found.</p>
+    }
 </div>
+
+
 
 @code {
     private IEnumerable<PropertyVM> properties { get; set; } = new List<PropertyVM>();
-    //private string nameuser;
+    private int? DeletePropertyId { get; set; } = 0;
     protected override async Task OnInitializedAsync()
     {
-        var propertyModels = await _unitOfWork.Properties.GetAllAsync(includeProp: "ApplicationUser");
-        properties = propertyModels.Select(p => new PropertyVM
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    ApplicationUserId = p.ApplicationUserId,
-                    ApplicationUser = p.ApplicationUser,
-                    Type = p.Type,
-                    PurchaseDateTime = p.PurchaseDateTime,
-                    InitialValue = p.InitialValue,
-                    DepreciationPeriod = p.DepreciationPeriod,
-                    DepreciationValue = p.DepreciationValue,
-                    CurrentValue = _propertyHelper.CalculationCurrentValue(p)
-                });
+        await LoadPropertiesAsync();
+    }
 
+    protected async Task LoadPropertiesAsync()
+    {
+        var propertyModels = await _unitOfWork.Properties.GetAllAsync(includeProp: "ApplicationUser");
+        properties = propertyModels.Select(p => {
+            var propertyVM = _iMapper.Map<PropertyVM>(p);
+            propertyVM.CurrentValue = _propertyHelper.CalculationCurrentValue(p);
+            return propertyVM;
+        });
+    }
+    private async Task HandleDelete(int id)
+    {
+        DeletePropertyId = id;
+        await _jsRuntime.InvokeVoidAsync("ShowDeleteConfirmationModal");
+    }
+
+    private async Task ConfirmDeleteClickAsync(bool isConfirmed)
+    {
+        if (isConfirmed && DeletePropertyId != 0)
+        {
+            var existingUser = await _unitOfWork.Properties.GetFirstOrDefaultAsync(x => x.Id == DeletePropertyId);
+            
+            await _unitOfWork.Properties.RemoveAsync(existingUser.Id);
+            await _unitOfWork.SaveAsync();
+
+            await LoadPropertiesAsync();
+            await _jsRuntime.InvokeVoidAsync("HideDeleteConfirmationModal");
+        }
     }
 }

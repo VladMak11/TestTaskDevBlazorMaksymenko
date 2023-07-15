@@ -5,7 +5,7 @@
 @using Microsoft.EntityFrameworkCore;
 @using System.Text;
 @using AutoMapper;
-
+@attribute [Authorize]
 
 @inject NavigationManager _navigationManager
 @inject AuthenticationStateProvider _authenticationStateProvider
@@ -67,9 +67,6 @@
         }
     </div>
 </div>
-
-
-
 
 @code {
 

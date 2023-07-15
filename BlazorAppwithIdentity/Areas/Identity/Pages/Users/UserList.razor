@@ -9,6 +9,7 @@
 @inject AuthenticationStateProvider _authenticationStateProvider
 @inject IJSRuntime _jsRuntime
 @inject IMapper _iMapper
+@attribute [Authorize]
 
 <_DeleteConfirmation ConfirmationChanged="ConfirmDeleteClickAsync"></_DeleteConfirmation>
 
@@ -61,7 +62,7 @@
     }
     else
     {
-        <p>No users found.</p>
+        <p>No properties found.</p>
     }
 </div>
 

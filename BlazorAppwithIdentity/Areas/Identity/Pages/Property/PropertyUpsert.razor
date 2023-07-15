@@ -1,80 +1,141 @@
 ﻿@page "/property/create"
+@page "/property/edit/{id:int}"
 @using System.Security.Claims;
 @using Microsoft.AspNetCore.Identity;
 @using AutoMapper;
+@using Microsoft.EntityFrameworkCore;
+
+@attribute [Authorize]
 
 @inject IUnitOfWork _unitOfWork
 @inject NavigationManager _navigationManager
 @inject AuthenticationStateProvider _authenticationStateProvider
 @inject IMapper _iMapper
+@inject UserManager<ApplicationUser> _userManager
 
-<div class="row my-2 card col-10">
-    <h3 class="card-title text-primary mb-3 ">Create Property</h3>
-    <div class="col-12">
-        <EditForm Model="property" OnValidSubmit="UpsertProperty">
-            <DataAnnotationsValidator />
-            <div class="form-group">
-                <label>Name</label>
-                <InputText @bind-Value="property.Name" class="form-control"></InputText>
-                <ValidationMessage For="()=>property.Name"></ValidationMessage>
-            </div>
-            <br />
-            <div class="form-group">
-                <label>Type</label>
-                <InputText @bind-Value="property.Type" class="form-control"></InputText>
-                <ValidationMessage For="()=>property.Type"></ValidationMessage>
-            </div>
-            <br />
-            <div class="form-group">
-                <label>Purchase DateTime</label>
-                <InputDate Type="InputDateType.DateTimeLocal" min="@DateTime.Today.ToString("f")" @bind-Value="property.PurchaseDateTime" class="form-control"></InputDate>
-                <ValidationMessage For="()=>property.PurchaseDateTime"></ValidationMessage>
-            </div>
-            <br />
-            <div class="form-group">
-                <label>Initial Value</label>
-                <InputNumber TValue="Decimal" @bind-Value="property.InitialValue" class="form-control" min="0"></InputNumber>
-                <ValidationMessage For="()=>property.InitialValue"></ValidationMessage>
-            </div>
-            <br />
-            <div class="form-group">
-                <label>Depreciation Period </label>
-                <InputSelect @bind-Value="property.DepreciationPeriod" class="form-control">
-                    <option value="0" selected>--Select Period--</option>
-                    @foreach (var item in DepreciationPeriods)
-                    {
-                        <option value="@item">@item</option>
-                    }
-                </InputSelect>
-                <ValidationMessage For="()=>property.DepreciationPeriod"></ValidationMessage>
-            </div>
-            <br />
-            <div class="form-group mb-2">
-                <label>Depreciation Value</label>
-                <InputNumber TValue="Decimal" @bind-Value="property.DepreciationValue" class="form-control"></InputNumber>
-                <ValidationMessage For="()=>property.DepreciationValue"></ValidationMessage>
-            </div>
-            <div class="form-group mb-2">
-                <button class="btn btn-primary">@Title</button>
-                <NavLink href="property" class="btn btn-secondary">Back to List</NavLink>
-            </div>
-        </EditForm>
+<div class="card shadow border-0 my-4 col-12 col-md-8 col-lg-6 mx-auto">
+    <div class="card-header bg-dark text-white text-center py-3">
+        <h1 class="m-0">@Title Property</h1>
+    </div>
+    <div class="card-body p-4">
+        @if (IsLoading)
+        {
+            <p>Loading...</p>
+        }
+        else
+        {
+            <EditForm Model="propertyVM" OnValidSubmit="UpsertPropertyAsync">
+                <DataAnnotationsValidator />
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <InputText @bind-Value="propertyVM.Name" class="form-control"></InputText>
+                            <ValidationMessage For="()=>propertyVM.Name"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label>Owner</label>
+                            <InputSelect @bind-Value="propertyVM.ApplicationUserId" class="form-select">
+                                <option value="0" disabled="disabled" selected>--Select Owner--</option>
+                                @foreach (var item in Users)
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+
+                            </InputSelect>
+                            <ValidationMessage For="()=>propertyVM.ApplicationUserId"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label>Type</label>
+                            <InputText @bind-Value="propertyVM.Type" class="form-control"></InputText>
+                            <ValidationMessage For="()=>propertyVM.Type"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label>Purchase DateTime</label>
+                            <InputDate Type="InputDateType.DateTimeLocal" min="@DateTime.Today.ToString("f")" @bind-Value="propertyVM.PurchaseDateTime" class="form-control"></InputDate>
+                            <ValidationMessage For="()=>propertyVM.PurchaseDateTime"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label>Initial Value</label>
+                            <InputNumber TValue="Decimal" @bind-Value="propertyVM.InitialValue" class="form-control" min="0"></InputNumber>
+                            <ValidationMessage For="()=>propertyVM.InitialValue"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label>Depreciation Period </label>
+                            <InputSelect @bind-Value="propertyVM.DepreciationPeriod" class="form-control">
+                                <option value="0" selected>--Select Period--</option>
+                                @foreach (var item in DepreciationPeriods)
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="()=>propertyVM.DepreciationPeriod"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label>Depreciation Value</label>
+                            <InputNumber TValue="Decimal" @bind-Value="propertyVM.DepreciationValue" class="form-control"></InputNumber>
+                            <ValidationMessage For="()=>propertyVM.DepreciationValue"></ValidationMessage>
+                        </div>
+                        <div class="form-group mb-2 mt-2 text-center">
+                            <button class="btn btn-primary">@Title</button>
+                            <NavLink href="property" class="btn btn-secondary">Back to List</NavLink>
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+        }
     </div>
 </div>
 
 @code {
-    private Property property { get; set; } = new Property() { PurchaseDateTime = DateTime.Now };
-    List<string> DepreciationPeriods = new() { "day", "week", "mounth", "year" };
-    private string Title { get; set; } = "Create";
 
-    private async void UpsertProperty()
+    [Parameter]
+    public int Id { get; set; }
+
+    private PropertyVM propertyVM { get; set; } = new PropertyVM() { PurchaseDateTime = DateTime.Now };
+    List<string> DepreciationPeriods = new() { "day", "week", "mounth", "year" };
+    private IEnumerable<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
+    private string Title { get; set; } = "Create";
+    public bool IsLoading { get; set; } = true;
+
+    protected override async Task OnInitializedAsync()
     {
-        var authenticationState = await _authenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authenticationState.User;
-        property.ApplicationUserId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        
-        await _unitOfWork.Properties.AddAsync(property);
-        await _unitOfWork.SaveAsync();
+        Users = await _userManager.Users.ToListAsync();
+        if (Id == 0)
+        {
+            IsLoading = false;
+        }
+        else
+        {
+            Title = "Update";
+            await LoadPropertyAsync();
+        }
+
+    }
+    private async Task LoadPropertyAsync()
+    { 
+        var searchPropertyInDB = await _unitOfWork.Properties.GetFirstOrDefaultAsync(x => x.Id == Id);
+        propertyVM = _iMapper.Map<PropertyVM>(searchPropertyInDB);
+        IsLoading = false;
+    }
+    private async Task UpsertPropertyAsync()
+    {
+        if (propertyVM.Id == 0)
+        {
+            var propery = _iMapper.Map<Property>(propertyVM);
+            await _unitOfWork.Properties.AddAsync(propery);
+            await _unitOfWork.SaveAsync();
+        }
+        else
+        {
+            var PropertyToUpdate = await _unitOfWork.Properties.GetFirstOrDefaultAsync(x => x.Id == propertyVM.Id);
+            if (PropertyToUpdate != null)
+            {
+                PropertyToUpdate = _iMapper.Map<PropertyVM, Property>(propertyVM, PropertyToUpdate);
+                await _unitOfWork.Properties.UpdateAsync(PropertyToUpdate);
+                await _unitOfWork.SaveAsync();
+            }
+        }
 
         _navigationManager.NavigateTo("property");
     }

@@ -11,11 +11,11 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add service DBcontext
-builder.Services.AddDbContext<ApplicationDbContext>(options => 
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    )
-);
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    //options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+});
 //builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts => { opts.Password.RequireNonAlphanumeric = false; })
 //                .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.Password.RequireNonAlphanumeric = false).AddEntityFrameworkStores<ApplicationDbContext>();
