@@ -9,59 +9,63 @@
 @inject AuthenticationStateProvider _authenticationStateProvider
 @inject UserManager<ApplicationUser> _userManager
 
-<div class="row my-2 card col-10">
-    <h3 class="card-title text-primary mb-3 ">@Title User</h3>
-    <div class="col-12">
+<div class="card shadow border-0 my-4 col-12 col-md-8 col-lg-6 mx-auto">
+    <div class="card-header bg-dark text-white text-center py-3">
+        <h1 class="m-0">@Title User</h1>
+    </div>
+    <div class="card-body p-4">
         @if (IsLoading)
         {
             <p>Loading...</p>
         }
         else
         {
-            <EditForm Model="objUser" OnSubmit="UpsertUserAsync">
+            <EditForm Model="objUser" OnValidSubmit="UpsertUserAsync">
                 <DataAnnotationsValidator />
-                <div class="form-group">
-                    <label>Name</label>
-                    <InputText @bind-Value="objUser.Name" class="form-control"></InputText>
-                    <ValidationMessage For="()=>objUser.Name"></ValidationMessage>
-                </div>
-                <br />
-                <div class="form-group">
-                    <label>E-mail</label>
-                    <InputText @bind-Value="objUser.Email" class="form-control"></InputText>
-                    <ValidationMessage For="()=>objUser.Email"></ValidationMessage>
-                </div>
-                <br />
-                <div class="form-group">
-                    <label>Address</label>
-                    <InputText @bind-Value="objUser.Address" class="form-control"></InputText>
-                    <ValidationMessage For="()=>objUser.Address"></ValidationMessage>
-                </div>
-                <br />
-                <div class="form-group">
-                    <label>Phone Number</label>
-                    <InputText @bind-Value="objUser.PhoneNumber" class="form-control"></InputText>
-                    <ValidationMessage For="()=>objUser.PhoneNumber"></ValidationMessage>
-                </div>
-                <br />
-                <div class="form-group mb-2">
-                    <label>Initial Property Value Sum</label>
-                    <InputNumber TValue="Decimal" @bind-Value="objUser.InitialPropertyValueSum" class="form-control"></InputNumber>
-                    <ValidationMessage For="()=>objUser.InitialPropertyValueSum"></ValidationMessage>
-                </div>
-                <div class="form-group mb-2">
-                    <label>Current Property Value Sum</label>
-                    <InputNumber TValue="Decimal" @bind-Value="objUser.CurrentPropertyValueSum" class="form-control"></InputNumber>
-                    <ValidationMessage For="()=>objUser.CurrentPropertyValueSum"></ValidationMessage>
-                </div>
-                <div class="form-group mb-2">
-                    <button type="submit" class="btn btn-primary">@Title</button>
-                    <NavLink href="user" class="btn btn-secondary">Back to List</NavLink>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <InputText @bind-Value="objUser.Name" class="form-control"></InputText>
+                            <ValidationMessage For="()=>objUser.Name"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label>E-mail</label>
+                            <InputText @bind-Value="objUser.Email" class="form-control"></InputText>
+                            <ValidationMessage For="()=>objUser.Email"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label>Address</label>
+                            <InputText @bind-Value="objUser.Address" class="form-control"></InputText>
+                            <ValidationMessage For="()=>objUser.Address"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <InputText @bind-Value="objUser.PhoneNumber" class="form-control"></InputText>
+                            <ValidationMessage For="()=>objUser.PhoneNumber"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label>Initial Property Value Sum</label>
+                            <InputNumber TValue="Decimal" @bind-Value="objUser.InitialPropertyValueSum" class="form-control"></InputNumber>
+                            <ValidationMessage For="()=>objUser.InitialPropertyValueSum"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label>Current Property Value Sum</label>
+                            <InputNumber TValue="Decimal" @bind-Value="objUser.CurrentPropertyValueSum" class="form-control"></InputNumber>
+                            <ValidationMessage For="()=>objUser.CurrentPropertyValueSum"></ValidationMessage>
+                        </div>
+                        <div class="form-group mb-2 mt-2 text-center">
+                            <button  class="btn btn-primary">@Title</button>
+                            <NavLink href="user" class="btn btn-secondary">Back to List</NavLink>
+                        </div>
+                    </div>
                 </div>
             </EditForm>
         }
     </div>
 </div>
+
+
 
 
 @code {
@@ -70,9 +74,9 @@
     public string Id { get; set; }
 
     private string Title { get; set; } = "Create";
-    private UserVM objUser { get; set; } = new UserVM() { };
+    private UserVM objUser { get; set; } = new UserVM();
     public bool IsLoading { get; set; } = true;
-    
+
     protected override async Task OnInitializedAsync()
     {
         if (string.IsNullOrEmpty(Id))
@@ -133,7 +137,7 @@
             }
         }
 
-        _navigationManager.NavigateTo("user"); 
+        _navigationManager.NavigateTo("user");
     }
 
 

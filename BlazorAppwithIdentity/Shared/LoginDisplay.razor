@@ -1,44 +1,31 @@
-﻿<AuthorizeView>
-    <Authorized>
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="text-light pt-3">
-                Hi dear, @context.User.Identity.Name
+﻿<ul class="navbar-nav">
+    <AuthorizeView>
+        <Authorized>
+            <li class="nav-item">
+                <span class="nav-link text-light">Hi dear, @context.User.Identity.Name</span>
             </li>
-            <li class="nav-item p-0">
+            <li class="nav-item">
                 <NavLink class="nav-link" href="Identity/Account/Logout">
-                    <span class="btn btn-light">
-                        Logout
-                    </span>
+                    <div class="text-light">
+                        <i class="bi bi-box-arrow-right"></i>Logout
+                    </div>
                 </NavLink>
             </li>
-        </ul>
-        @*<a href="Identity/Account/Logout">Logout</a>*@
-    </Authorized>
-    <NotAuthorized>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item p-2">
-                    <NavLink class="nav-link" href="Identity/Account/Register">
-                        <span class="btn btn-light">
-                            Register
-                        </span>
-                    </NavLink>
-                </li>
-                <li class="nav-item p-2">
-                    <NavLink class="nav-link" href="Identity/Account/Login">
-                        <span class="btn btn-light">
-                            Login
-                        </span>
-                    </NavLink>
-                 </li>
-            </ul>
-        </div>
-
-        @*<a href="Identity/Account/Register">Register</a>*@
-        @*<a href="Identity/Account/Login">Login</a>*@
-    </NotAuthorized>
-</AuthorizeView>
-
+        </Authorized>
+        <NotAuthorized>
+            <li class="nav-item">
+                <NavLink class="nav-link text-light" href="Identity/Account/Register">
+                    <i class="bi bi-person-add"></i> Register
+                </NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link text-light" href="Identity/Account/Login">
+                    <i class="bi bi-door-open-fill"></i> Login
+                </NavLink>
+            </li>
+        </NotAuthorized>
+    </AuthorizeView>
+</ul>
 
 
 @code {

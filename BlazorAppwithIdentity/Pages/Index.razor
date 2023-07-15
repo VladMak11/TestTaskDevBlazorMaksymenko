@@ -1,9 +1,52 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
-
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card bg-light mb-3">
+                <div class="card-header text-center">Project Description</div>
+                <div class="card-body">
+                    <h4 class="card-title text-center">Project Overview</h4>
+                    <p class="card-text fw-bold">
+                        To start working with the application, you need to authenticate by logging in.
+                    </p>
+                    <p class="card-text">
+                        Page of all users:
+                    </p>
+                    <ul class="list-group">
+                        <li class="list-group-item">Displays a table with all user fields.</li>
+                        <li class="list-group-item">Clicking on a row redirects to the user editing page.</li>
+                        <li class="list-group-item">Contains a button to navigate to the create new user page.</li>
+                    </ul>
+                    <p class="card-text">
+                        User creation and editing page:
+                    </p>
+                    <ul class="list-group">
+                        <li class="list-group-item">Allows filling in all user properties such as name, email, address, phone, etc.</li>
+                        <li class="list-group-item">In editing mode, the data of the selected user is automatically populated.</li>
+                        <li class="list-group-item">Contains a button to save user data to the database.</li>
+                    </ul>
+                    <p class="card-text">
+                        Page of all properties:
+                    </p>
+                    <ul class="list-group">
+                        <li class="list-group-item">Similar to the users' page.</li>
+                        <li class="list-group-item">Displays a table with all property fields.</li>
+                        <li class="list-group-item">Clicking on a row redirects to the property editing page.</li>
+                    </ul>
+                    <p class="card-text">
+                        Property creation and editing page:
+                    </p>
+                    <ul class="list-group">
+                        <li class="list-group-item">Similar to the user creation and editing page.</li>
+                        <li class="list-group-item">Allows filling in all property properties such as name, owner, type, purchase date, initial value, etc.</li>
+                    </ul>
+                    <br />
+                    <p class="card-text">
+                        User and property management is handled using the Identity mechanism, inheriting from the IdentityUser class.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

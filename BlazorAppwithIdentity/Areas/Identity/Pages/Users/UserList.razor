@@ -9,22 +9,27 @@
 
 <_DeleteConfirmation ConfirmationChanged="ConfirmDeleteClickAsync"></_DeleteConfirmation>
 
-<div class="row mt-4">
-    <div class="col-6">
-        <h4 class="card-title text-black">Users List</h4>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-6 d-flex justify-content-end">
+            <h4 class="card-title text-black">Users List</h4>
+        </div>
+        <div class="col-6 d-flex justify-content-end mb-2">
+            <a href="user/create" class="btn btn-dark">
+                <i class="bi bi-patch-plus"></i>
+                <span class="ms-2">Add New User</span>
+            </a>
+        </div>
     </div>
-    <div class="col-4 offset-2">
-        <a href="user/create" class="btn btn-primary form-control">Add New User</a>
-    </div>
-    <div class="col-12">
-        @if (users.Any())
-        {
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
+    @if (users.Any())
+    {
+        <div class="table-responsive bg-white">
+            <table class="table table-bordered mt-4 table-hover">
+                <thead class="bg-dark">
+                    <tr class="text-light">
                         <th>Name</th>
                         <th>Email</th>
-                        <th>Adress</th>
+                        <th>Address</th>
                         <th>Phone Number</th>
                         <th>Initial Property Value Sum</th>
                         <th>Current Property Value Sum</th>
@@ -35,35 +40,28 @@
                     @foreach (var item in users)
                     {
                         <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Email</td>
+                            <td>@item.Address</td>
+                            <td>@item.PhoneNumber</td>
+                            <td>@item.InitialPropertyValueSum</td>
+                            <td>@item.CurrentPropertyValueSum</td>
                             <td>
-                                @item.Name
-                            </td>
-                            <td>
-                                @item.Email
-                            </td>
-                            <td>
-                                @item.Address
-                            </td>
-                            <td>
-                                @item.PhoneNumber
-                            </td>
-                            <td>
-                                @item.InitialPropertyValueSum
-                            </td>
-                            <td>
-                                @item.CurrentPropertyValueSum
-                            </td>
-                            <td>
-                                <NavLink href="@($"user/edit/{item.Id}")" class="btn-primary btn">Edit</NavLink>
-                                <button class="btn btn-danger" @onclick="async () => await HandleDelete(item.Id)">Delete</button>
+                                <NavLink href="@($"user/edit/{item.Id}")" class="btn btn-primary"><i class="bi bi-pencil-square"></i></NavLink>
+                                <button class="btn btn-danger" @onclick="async () => await HandleDelete(item.Id)"><i class="bi bi-trash-fill"></i></button>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
-        }
-    </div>
+        </div>
+    }
+    else
+    {
+        <p>No users found.</p>
+    }
 </div>
+
 
 
 @code {
@@ -83,7 +81,7 @@
                 PhoneNumber = p.PhoneNumber,
                 InitialPropertyValueSum = p.InitialPropertyValueSum.GetValueOrDefault(),
                 CurrentPropertyValueSum = p.CurrentPropertyValueSum.GetValueOrDefault()
-            }).Where(p => p.Id != user.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            });
     }
 
     private async Task HandleDelete(string id)

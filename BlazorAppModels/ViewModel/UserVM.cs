@@ -10,7 +10,6 @@ namespace BlazorAppModels.ViewModel
 {
     public class UserVM
     {
-        [Required]
         public string Id { get; set; }
         [Required(ErrorMessage = "The name field is required.")]
         public string Name { get; set; }
