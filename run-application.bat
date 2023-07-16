@@ -1,0 +1,3 @@
+cd BlazorAppwithIdentity
+
+dotnet run
