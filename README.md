@@ -27,12 +27,12 @@
 - Bootstrap 5
 - MS SQL Server
 - Docker
-
+ 
 ### How to Run?
 1. Create Doker Container.
 
 ```
-docker run -e "ACCEPT_EULA=Y" -e 'MMSQL_PID=Express' -e "MSSQL_SA_PASSWORD=VladM20472019" -p 1434:1433 -v sqlvolume:/var/opt/mssql -d --name sql-db2 mcr.microsoft.com/mssql/server:2019-latest 
+docker run -e "ACCEPT_EULA=Y" -e 'MMSQL_PID=Express' -e "MSSQL_SA_PASSWORD=VladM20472019" -p 1433:1433 -v sqlvolume:/var/opt/mssql -d --name sql-db mcr.microsoft.com/mssql/server:2019-latest 
 ```
 2.  Copy DB backup to container (start copy-backup.bat).
 3.  Load DB backup.
